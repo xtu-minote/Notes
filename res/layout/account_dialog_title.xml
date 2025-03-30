@@ -1,26 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- Copyright (c) 2010-2011, The MiCode Open Source Community (www.micode.net)
-
-     Licensed under the Apache License, Version 2.0 (the "License");
-     you may not use this file except in compliance with the License.
-     You may obtain a copy of the License at
-
-          http://www.apache.org/licenses/LICENSE-2.0
-
-     Unless required by applicable law or agreed to in writing, software
-     distributed under the License is distributed on an "AS IS" BASIS,
-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     See the License for the specific language governing permissions and
-     limitations under the License.
+<!--
+    此XML文件定义了一个LinearLayout，用于显示账户对话框的标题和子标题。
+    它是MiCode开源社区的一部分，受Apache License 2.0保护。
+    详细信息见底部注释。
 -->
 
-<LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical"
-        xmlns:android="http://schemas.android.com/apk/res/android">
+<LinearLayout android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- 标题文本视图，用于显示对话框的标题 -->
     <TextView
         android:id="@+id/account_dialog_title"
         style="?android:attr/textAppearanceMedium"
@@ -30,14 +21,15 @@
         android:layout_marginTop="-2.7dip"
         android:layout_marginBottom="-2.7dip"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
+    <!-- 子标题文本视图，用于显示对话框的子标题信息 -->
     <TextView
         android:id="@+id/account_dialog_subtitle"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dip"
         android:layout_marginBottom="1dip"
-        android:gravity="center"/>
+        android:gravity="center" />
 
 </LinearLayout>

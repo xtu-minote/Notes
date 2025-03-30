@@ -1,20 +1,10 @@
 /*
- * Copyright (c) 2010-2011, The MiCode Open Source Community (www.micode.net)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 注意：此代码段的版权归 MiCode 开源社区所有（www.micode.net）
+ * 本代码遵循 Apache 2.0 许可证，您可以在 http://www.apache.org/licenses/LICENSE-2.0 查看许可证内容。
  */
 
 package net.micode.notes.widget;
+
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -32,19 +22,28 @@ import net.micode.notes.tool.ResourceParser;
 import net.micode.notes.ui.NoteEditActivity;
 import net.micode.notes.ui.NotesListActivity;
 
+/**
+ * 笔记小部件提供者抽象类，扩展自AppWidgetProvider，用于管理和更新笔记小部件的内容。
+ */
 public abstract class NoteWidgetProvider extends AppWidgetProvider {
-    public static final String [] PROJECTION = new String [] {
-        NoteColumns.ID,
-        NoteColumns.BG_COLOR_ID,
-        NoteColumns.SNIPPET
+    // 查询笔记时用到的列名数组
+    public static final String[] PROJECTION = new String[]{
+            NoteColumns.ID,
+            NoteColumns.BG_COLOR_ID,
+            NoteColumns.SNIPPET
     };
 
-    public static final int COLUMN_ID           = 0;
-    public static final int COLUMN_BG_COLOR_ID  = 1;
-    public static final int COLUMN_SNIPPET      = 2;
+    // 列的索引常量
+    public static final int COLUMN_ID = 0;
+    public static final int COLUMN_BG_COLOR_ID = 1;
+    public static final int COLUMN_SNIPPET = 2;
 
+    // 日志标签
     private static final String TAG = "NoteWidgetProvider";
 
+    /**
+     * 当小部件被删除时调用，更新数据库中对应小部件的ID为无效ID。
+     */
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
         ContentValues values = new ContentValues();
@@ -53,24 +52,46 @@ public abstract class NoteWidgetProvider extends AppWidgetProvider {
             context.getContentResolver().update(Notes.CONTENT_NOTE_URI,
                     values,
                     NoteColumns.WIDGET_ID + "=?",
-                    new String[] { String.valueOf(appWidgetIds[i])});
+                    new String[]{String.valueOf(appWidgetIds[i])});
         }
     }
 
+    /**
+     * 根据小部件ID查询对应的笔记信息。
+     *
+     * @param context  上下文
+     * @param widgetId 小部件ID
+     * @return 返回查询到的Cursor对象，包含笔记的摘要、背景ID等信息。
+     */
     private Cursor getNoteWidgetInfo(Context context, int widgetId) {
         return context.getContentResolver().query(Notes.CONTENT_NOTE_URI,
                 PROJECTION,
                 NoteColumns.WIDGET_ID + "=? AND " + NoteColumns.PARENT_ID + "<>?",
-                new String[] { String.valueOf(widgetId), String.valueOf(Notes.ID_TRASH_FOLER) },
+                new String[]{String.valueOf(widgetId), String.valueOf(Notes.ID_TRASH_FOLER)},
                 null);
     }
 
+    /**
+     * 更新小部件显示内容的通用方法。
+     *
+     * @param context          上下文
+     * @param appWidgetManager AppWidget管理器
+     * @param appWidgetIds     小部件ID数组
+     */
     protected void update(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         update(context, appWidgetManager, appWidgetIds, false);
     }
 
+    /**
+     * 根据是否隐私模式更新小部件显示内容。
+     *
+     * @param context          上下文
+     * @param appWidgetManager AppWidget管理器
+     * @param appWidgetIds     小部件ID数组
+     * @param privacyMode      是否为隐私模式
+     */
     private void update(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds,
-            boolean privacyMode) {
+                        boolean privacyMode) {
         for (int i = 0; i < appWidgetIds.length; i++) {
             if (appWidgetIds[i] != AppWidgetManager.INVALID_APPWIDGET_ID) {
                 int bgId = ResourceParser.getDefaultBgId(context);
@@ -103,9 +124,8 @@ public abstract class NoteWidgetProvider extends AppWidgetProvider {
                 RemoteViews rv = new RemoteViews(context.getPackageName(), getLayoutId());
                 rv.setImageViewResource(R.id.widget_bg_image, getBgResourceId(bgId));
                 intent.putExtra(Notes.INTENT_EXTRA_BACKGROUND_ID, bgId);
-                /**
-                 * Generate the pending intent to start host for the widget
-                 */
+
+                // 为小部件的点击事件设置PendingIntent
                 PendingIntent pendingIntent = null;
                 if (privacyMode) {
                     rv.setTextViewText(R.id.widget_text,
@@ -124,9 +144,26 @@ public abstract class NoteWidgetProvider extends AppWidgetProvider {
         }
     }
 
+    /**
+     * 获取背景资源的ID。
+     *
+     * @param bgId 背景ID
+     * @return 返回对应的资源ID
+     */
     protected abstract int getBgResourceId(int bgId);
 
+    /**
+     * 获取小部件布局的ID。
+     *
+     * @return 返回布局的资源ID
+     */
     protected abstract int getLayoutId();
 
+    /**
+     * 获取小部件的类型。
+     *
+     * @return 返回小部件的类型
+     */
     protected abstract int getWidgetType();
 }
+

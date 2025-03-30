@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) 2010-2011, The MiCode Open Source Community (www.micode.net)
 
-     Licensed under the Apache License, Version 2.0 (the "License");
-     you may not use this file except in compliance with the License.
-     You may obtain a copy of the License at
-
-          http://www.apache.org/licenses/LICENSE-2.0
-
-     Unless required by applicable law or agreed to in writing, software
-     distributed under the License is distributed on an "AS IS" BASIS,
-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     See the License for the specific language governing permissions and
-     limitations under the License.
+<!--
+    此布局文件用于创建一个水平线性布局，包含四个NumberPicker组件，用于选择日期、小时、分钟和AM/PM标志。
+    它是MiCode开源社区的一部分，受Apache 2.0许可证保护。
 -->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_gravity="center_horizontal"
@@ -24,8 +16,7 @@
         android:layout_width="120dip"
         android:layout_height="wrap_content"
         android:focusable="true"
-        android:focusableInTouchMode="true"
-        />
+        android:focusableInTouchMode="true" />
 
     <NumberPicker
         android:id="@+id/hour"
@@ -33,8 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dip"
         android:focusable="true"
-        android:focusableInTouchMode="true"
-        />
+        android:focusableInTouchMode="true" />
 
     <NumberPicker
         android:id="@+id/minute"
@@ -42,8 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dip"
         android:focusable="true"
-        android:focusableInTouchMode="true"
-        />
+        android:focusableInTouchMode="true" />
 
     <NumberPicker
         android:id="@+id/amPm"
@@ -51,6 +40,5 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dip"
         android:focusable="true"
-        android:focusableInTouchMode="true"
-        />
+        android:focusableInTouchMode="true" />
 </LinearLayout>

@@ -1,17 +1,6 @@
 /*
- * Copyright (c) 2010-2011, The MiCode Open Source Community (www.micode.net)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ Node类定义了一个节点的基本属性和操作，用于数据同步时的表现和转换。
+ 它是用于表示通用数据节点的抽象类，具体的数据操作和格式转换由其子类实现。
  */
 
 package net.micode.notes.gtask.data;
@@ -20,33 +9,25 @@ import android.database.Cursor;
 
 import org.json.JSONObject;
 
+
+//定义了各种用于表征同步状态的常量
 public abstract class Node {
-    public static final int SYNC_ACTION_NONE = 0;
+    public static final int SYNC_ACTION_NONE = 0; //无动作，本地和云端都无可更新内容（即本地和云端内容一致）
+    public static final int SYNC_ACTION_ADD_REMOTE = 1; //添加远程节点，需要在远程云端增加内容
+    public static final int SYNC_ACTION_ADD_LOCAL = 2; //添加本地节点，需要在本地增加内容
+    public static final int SYNC_ACTION_DEL_REMOTE = 3; //删除远程节点，需要在远程云端删除内容
+    public static final int SYNC_ACTION_DEL_LOCAL = 4; //删除本地节点，需要在本地删除内容
+    public static final int SYNC_ACTION_UPDATE_REMOTE = 5; //更新远程节点，需要将本地内容更新到远程云端
+    public static final int SYNC_ACTION_UPDATE_LOCAL = 6; //更新本地节点，需要将远程云端内容更新到本地
+    public static final int SYNC_ACTION_UPDATE_CONFLICT = 7; //同步出现冲突
+    public static final int SYNC_ACTION_ERROR = 8; //同步出现错误
 
-    public static final int SYNC_ACTION_ADD_REMOTE = 1;
+    private String mGid; //全局唯一标识符
+    private String mName; //节点名称
+    private long mLastModified; //最后修改时间
+    private boolean mDeleted; //表示节点是否被删除
 
-    public static final int SYNC_ACTION_ADD_LOCAL = 2;
-
-    public static final int SYNC_ACTION_DEL_REMOTE = 3;
-
-    public static final int SYNC_ACTION_DEL_LOCAL = 4;
-
-    public static final int SYNC_ACTION_UPDATE_REMOTE = 5;
-
-    public static final int SYNC_ACTION_UPDATE_LOCAL = 6;
-
-    public static final int SYNC_ACTION_UPDATE_CONFLICT = 7;
-
-    public static final int SYNC_ACTION_ERROR = 8;
-
-    private String mGid;
-
-    private String mName;
-
-    private long mLastModified;
-
-    private boolean mDeleted;
-
+    //构造函数，初始化节点属性
     public Node() {
         mGid = null;
         mName = "";
@@ -54,46 +35,60 @@ public abstract class Node {
         mDeleted = false;
     }
 
+    //生成创建节点的JSON动作
     public abstract JSONObject getCreateAction(int actionId);
 
+    //生成更新节点的JSON动作
     public abstract JSONObject getUpdateAction(int actionId);
 
+    //根据远程JSON内容设置节点内容
     public abstract void setContentByRemoteJSON(JSONObject js);
 
+    //根据本地JSON内容设置节点内容
     public abstract void setContentByLocalJSON(JSONObject js);
 
+    //从内容生成本地JSON表示
     public abstract JSONObject getLocalJSONFromContent();
 
+    //根据Cursor获取同步动作
     public abstract int getSyncAction(Cursor c);
 
+    //设置节点的全局唯一标识符
     public void setGid(String gid) {
         this.mGid = gid;
     }
 
+    //设置节点名称
     public void setName(String name) {
         this.mName = name;
     }
 
+    //设置节点最后修改时间
     public void setLastModified(long lastModified) {
         this.mLastModified = lastModified;
     }
 
+    //设置节点是否被删除
     public void setDeleted(boolean deleted) {
         this.mDeleted = deleted;
     }
 
+    //获取节点的全局唯一标识符
     public String getGid() {
         return this.mGid;
     }
 
+    //获取节点名称
     public String getName() {
         return this.mName;
     }
 
+    //获取节点最后修改时间
     public long getLastModified() {
         return this.mLastModified;
     }
 
+    //获取节点是否被删除的标志
     public boolean getDeleted() {
         return this.mDeleted;
     }

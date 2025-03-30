@@ -37,16 +37,21 @@ import net.micode.notes.R;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 自定义的可编辑文本视图，支持文本变化监听、删除和新增文本事件。
+ */
 public class NoteEditText extends EditText {
     private static final String TAG = "NoteEditText";
-    private int mIndex;
-    private int mSelectionStartBeforeDelete;
+    private int mIndex; // 当前文本视图的索引
+    private int mSelectionStartBeforeDelete; // 删除操作前的选择起始位置
 
-    private static final String SCHEME_TEL = "tel:" ;
-    private static final String SCHEME_HTTP = "http:" ;
-    private static final String SCHEME_EMAIL = "mailto:" ;
+    private static final String SCHEME_TEL = "tel:";
+    private static final String SCHEME_HTTP = "http:";
+    private static final String SCHEME_EMAIL = "mailto:";
 
+    // URL方案与对应操作资源ID的映射
     private static final Map<String, Integer> sSchemaActionResMap = new HashMap<String, Integer>();
+
     static {
         sSchemaActionResMap.put(SCHEME_TEL, R.string.note_link_tel);
         sSchemaActionResMap.put(SCHEME_HTTP, R.string.note_link_web);
@@ -54,56 +59,84 @@ public class NoteEditText extends EditText {
     }
 
     /**
-     * Call by the {@link NoteEditActivity} to delete or add edit text
+     * 文本视图变化监听接口。
      */
     public interface OnTextViewChangeListener {
         /**
-         * Delete current edit text when {@link KeyEvent#KEYCODE_DEL} happens
-         * and the text is null
+         * 当按下删除键且文本为空时，删除当前文本视图。
          */
         void onEditTextDelete(int index, String text);
 
         /**
-         * Add edit text after current edit text when {@link KeyEvent#KEYCODE_ENTER}
-         * happen
+         * 当按下回车键时，新增一个文本视图。
          */
         void onEditTextEnter(int index, String text);
 
         /**
-         * Hide or show item option when text change
+         * 当文本变化时，隐藏或显示项目选项。
          */
         void onTextChange(int index, boolean hasText);
     }
 
     private OnTextViewChangeListener mOnTextViewChangeListener;
 
+    /**
+     * 构造函数，初始化编辑文本视图。
+     *
+     * @param context 上下文对象
+     */
     public NoteEditText(Context context) {
         super(context, null);
         mIndex = 0;
     }
 
+    /**
+     * 设置当前文本视图的索引。
+     *
+     * @param index 当前文本视图的索引
+     */
     public void setIndex(int index) {
         mIndex = index;
     }
 
+    /**
+     * 设置文本视图变化监听器。
+     *
+     * @param listener 文本视图变化监听器
+     */
     public void setOnTextViewChangeListener(OnTextViewChangeListener listener) {
         mOnTextViewChangeListener = listener;
     }
 
+    /**
+     * 构造函数，初始化编辑文本视图。
+     *
+     * @param context 上下文对象
+     * @param attrs   属性集
+     */
     public NoteEditText(Context context, AttributeSet attrs) {
         super(context, attrs, android.R.attr.editTextStyle);
     }
 
+    /**
+     * 构造函数，初始化编辑文本视图。
+     *
+     * @param context  上下文对象
+     * @param attrs    属性集
+     * @param defStyle 样式
+     */
     public NoteEditText(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        // TODO Auto-generated constructor stub
     }
 
+    /**
+     * 处理触摸事件，调整光标位置。
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-
+                // 计算触摸位置相对于文本的偏移量，并调整光标位置
                 int x = (int) event.getX();
                 int y = (int) event.getY();
                 x -= getTotalPaddingLeft();
@@ -121,15 +154,20 @@ public class NoteEditText extends EditText {
         return super.onTouchEvent(event);
     }
 
+    /**
+     * 处理键盘按下事件。
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_ENTER:
+                // 处理回车键事件，准备新增文本视图
                 if (mOnTextViewChangeListener != null) {
                     return false;
                 }
                 break;
             case KeyEvent.KEYCODE_DEL:
+                // 记录删除操作前的选择位置
                 mSelectionStartBeforeDelete = getSelectionStart();
                 break;
             default:
@@ -138,10 +176,14 @@ public class NoteEditText extends EditText {
         return super.onKeyDown(keyCode, event);
     }
 
+    /**
+     * 处理键盘弹起事件。
+     */
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        switch(keyCode) {
+        switch (keyCode) {
             case KeyEvent.KEYCODE_DEL:
+                // 处理删除键事件，若为首个文本且非空，则删除当前文本
                 if (mOnTextViewChangeListener != null) {
                     if (0 == mSelectionStartBeforeDelete && mIndex != 0) {
                         mOnTextViewChangeListener.onEditTextDelete(mIndex, getText().toString());
@@ -152,6 +194,7 @@ public class NoteEditText extends EditText {
                 }
                 break;
             case KeyEvent.KEYCODE_ENTER:
+                // 处理回车键事件，新增文本视图
                 if (mOnTextViewChangeListener != null) {
                     int selectionStart = getSelectionStart();
                     String text = getText().subSequence(selectionStart, length()).toString();
@@ -167,6 +210,9 @@ public class NoteEditText extends EditText {
         return super.onKeyUp(keyCode, event);
     }
 
+    /**
+     * 当焦点变化时，通知文本变化情况。
+     */
     @Override
     protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
         if (mOnTextViewChangeListener != null) {
@@ -179,6 +225,9 @@ public class NoteEditText extends EditText {
         super.onFocusChanged(focused, direction, previouslyFocusedRect);
     }
 
+    /**
+     * 创建上下文菜单，支持点击URL跳转。
+     */
     @Override
     protected void onCreateContextMenu(ContextMenu menu) {
         if (getText() instanceof Spanned) {
@@ -191,8 +240,8 @@ public class NoteEditText extends EditText {
             final URLSpan[] urls = ((Spanned) getText()).getSpans(min, max, URLSpan.class);
             if (urls.length == 1) {
                 int defaultResId = 0;
-                for(String schema: sSchemaActionResMap.keySet()) {
-                    if(urls[0].getURL().indexOf(schema) >= 0) {
+                for (String schema : sSchemaActionResMap.keySet()) {
+                    if (urls[0].getURL().indexOf(schema) >= 0) {
                         defaultResId = sSchemaActionResMap.get(schema);
                         break;
                     }
@@ -205,7 +254,7 @@ public class NoteEditText extends EditText {
                 menu.add(0, 0, 0, defaultResId).setOnMenuItemClickListener(
                         new OnMenuItemClickListener() {
                             public boolean onMenuItemClick(MenuItem item) {
-                                // goto a new intent
+                                // 跳转到URL指向的页面
                                 urls[0].onClick(NoteEditText.this);
                                 return true;
                             }
@@ -215,3 +264,4 @@ public class NoteEditText extends EditText {
         super.onCreateContextMenu(menu);
     }
 }
+

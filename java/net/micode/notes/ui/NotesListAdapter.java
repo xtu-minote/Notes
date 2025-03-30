@@ -31,18 +31,32 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 
+/**
+ * 用于管理笔记列表的适配器，继承自CursorAdapter。
+ */
 public class NotesListAdapter extends CursorAdapter {
     private static final String TAG = "NotesListAdapter";
     private Context mContext;
+    // 用于存储选中项的索引和状态
     private HashMap<Integer, Boolean> mSelectedIndex;
-    private int mNotesCount;
-    private boolean mChoiceMode;
+    private int mNotesCount; // 笔记总数
+    private boolean mChoiceMode; // 选择模式标志
 
+    /**
+     * AppWidget属性容器，用于存储与小部件相关的数据。
+     */
     public static class AppWidgetAttribute {
-        public int widgetId;
-        public int widgetType;
-    };
+        public int widgetId; // 小部件ID
+        public int widgetType; // 小部件类型
+    }
 
+    ;
+
+    /**
+     * 构造函数。
+     *
+     * @param context 上下文对象
+     */
     public NotesListAdapter(Context context) {
         super(context, null);
         mSelectedIndex = new HashMap<Integer, Boolean>();
@@ -50,11 +64,26 @@ public class NotesListAdapter extends CursorAdapter {
         mNotesCount = 0;
     }
 
+    /**
+     * 创建新的列表项视图。
+     *
+     * @param context 上下文对象
+     * @param cursor  数据游标
+     * @param parent  父视图
+     * @return 新的列表项视图
+     */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         return new NotesListItem(context);
     }
 
+    /**
+     * 绑定数据到视图。
+     *
+     * @param view    列表项视图
+     * @param context 上下文对象
+     * @param cursor  数据游标
+     */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         if (view instanceof NotesListItem) {
@@ -64,20 +93,41 @@ public class NotesListAdapter extends CursorAdapter {
         }
     }
 
+    /**
+     * 设置指定位置的项为选中或未选中状态。
+     *
+     * @param position 项的位置
+     * @param checked  选中状态
+     */
     public void setCheckedItem(final int position, final boolean checked) {
         mSelectedIndex.put(position, checked);
         notifyDataSetChanged();
     }
 
+    /**
+     * 获取当前是否处于选择模式。
+     *
+     * @return 选择模式状态
+     */
     public boolean isInChoiceMode() {
         return mChoiceMode;
     }
 
+    /**
+     * 设置选择模式。
+     *
+     * @param mode 选择模式状态
+     */
     public void setChoiceMode(boolean mode) {
         mSelectedIndex.clear();
         mChoiceMode = mode;
     }
 
+    /**
+     * 全选或全不选。
+     *
+     * @param checked 选中状态
+     */
     public void selectAll(boolean checked) {
         Cursor cursor = getCursor();
         for (int i = 0; i < getCount(); i++) {
@@ -89,6 +139,11 @@ public class NotesListAdapter extends CursorAdapter {
         }
     }
 
+    /**
+     * 获取所有选中项的ID集合。
+     *
+     * @return 选中项ID的HashSet
+     */
     public HashSet<Long> getSelectedItemIds() {
         HashSet<Long> itemSet = new HashSet<Long>();
         for (Integer position : mSelectedIndex.keySet()) {
@@ -105,6 +160,11 @@ public class NotesListAdapter extends CursorAdapter {
         return itemSet;
     }
 
+    /**
+     * 获取所有选中小部件的属性集合。
+     *
+     * @return 选中小部件属性的HashSet
+     */
     public HashSet<AppWidgetAttribute> getSelectedWidget() {
         HashSet<AppWidgetAttribute> itemSet = new HashSet<AppWidgetAttribute>();
         for (Integer position : mSelectedIndex.keySet()) {
@@ -116,9 +176,6 @@ public class NotesListAdapter extends CursorAdapter {
                     widget.widgetId = item.getWidgetId();
                     widget.widgetType = item.getWidgetType();
                     itemSet.add(widget);
-                    /**
-                     * Don't close cursor here, only the adapter could close it
-                     */
                 } else {
                     Log.e(TAG, "Invalid cursor");
                     return null;
@@ -128,6 +185,11 @@ public class NotesListAdapter extends CursorAdapter {
         return itemSet;
     }
 
+    /**
+     * 获取选中项的数量。
+     *
+     * @return 选中项数量
+     */
     public int getSelectedCount() {
         Collection<Boolean> values = mSelectedIndex.values();
         if (null == values) {
@@ -143,11 +205,22 @@ public class NotesListAdapter extends CursorAdapter {
         return count;
     }
 
+    /**
+     * 判断是否全部选中。
+     *
+     * @return 全部选中的状态
+     */
     public boolean isAllSelected() {
         int checkedCount = getSelectedCount();
         return (checkedCount != 0 && checkedCount == mNotesCount);
     }
 
+    /**
+     * 检查指定位置的项是否被选中。
+     *
+     * @param position 项的位置
+     * @return 选中状态
+     */
     public boolean isSelectedItem(final int position) {
         if (null == mSelectedIndex.get(position)) {
             return false;
@@ -155,18 +228,29 @@ public class NotesListAdapter extends CursorAdapter {
         return mSelectedIndex.get(position);
     }
 
+    /**
+     * 当内容改变时调用，更新笔记数量。
+     */
     @Override
     protected void onContentChanged() {
         super.onContentChanged();
         calcNotesCount();
     }
 
+    /**
+     * 当游标改变时调用，更新笔记数量。
+     *
+     * @param cursor 新的游标
+     */
     @Override
     public void changeCursor(Cursor cursor) {
         super.changeCursor(cursor);
         calcNotesCount();
     }
 
+    /**
+     * 计算并更新笔记总数。
+     */
     private void calcNotesCount() {
         mNotesCount = 0;
         for (int i = 0; i < getCount(); i++) {
@@ -182,3 +266,4 @@ public class NotesListAdapter extends CursorAdapter {
         }
     }
 }
+

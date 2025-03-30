@@ -1,19 +1,9 @@
 /*
- * Copyright (c) 2010-2011, The MiCode Open Source Community (www.micode.net)
+ * AlarmReceiver类 - 用于处理闹钟广播接收
+ * 当接收到闹钟相关的广播时，该类会启动一个指定的Activity
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * extends BroadcastReceiver: 继承自Android的BroadcastReceiver类
  */
-
 package net.micode.notes.ui;
 
 import android.content.BroadcastReceiver;
@@ -21,10 +11,20 @@ import android.content.Context;
 import android.content.Intent;
 
 public class AlarmReceiver extends BroadcastReceiver {
+    /*
+     * onReceive方法 - 系统调用的接收广播的方法
+     * 当接收到广播时，该方法会被调用，然后启动AlarmAlertActivity
+     *
+     * @param context 上下文对象，提供了调用环境的信息
+     * @param intent  包含广播的内容
+     */
     @Override
     public void onReceive(Context context, Intent intent) {
+        // 设置Intent的类，以便启动AlarmAlertActivity
         intent.setClass(context, AlarmAlertActivity.class);
+        // 添加标志，表示在一个新的任务中启动Activity
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        // 根据设置的Intent启动Activity
         context.startActivity(intent);
     }
 }

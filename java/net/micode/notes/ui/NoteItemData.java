@@ -26,35 +26,41 @@ import net.micode.notes.data.Notes.NoteColumns;
 import net.micode.notes.tool.DataUtils;
 
 
+/**
+ * 代表一个笔记项的数据类，用于存储和管理笔记的各种信息。
+ */
 public class NoteItemData {
-    static final String [] PROJECTION = new String [] {
-        NoteColumns.ID,
-        NoteColumns.ALERTED_DATE,
-        NoteColumns.BG_COLOR_ID,
-        NoteColumns.CREATED_DATE,
-        NoteColumns.HAS_ATTACHMENT,
-        NoteColumns.MODIFIED_DATE,
-        NoteColumns.NOTES_COUNT,
-        NoteColumns.PARENT_ID,
-        NoteColumns.SNIPPET,
-        NoteColumns.TYPE,
-        NoteColumns.WIDGET_ID,
-        NoteColumns.WIDGET_TYPE,
+    // 定义查询时要投影的列
+    static final String[] PROJECTION = new String[]{
+            NoteColumns.ID,
+            NoteColumns.ALERTED_DATE,
+            NoteColumns.BG_COLOR_ID,
+            NoteColumns.CREATED_DATE,
+            NoteColumns.HAS_ATTACHMENT,
+            NoteColumns.MODIFIED_DATE,
+            NoteColumns.NOTES_COUNT,
+            NoteColumns.PARENT_ID,
+            NoteColumns.SNIPPET,
+            NoteColumns.TYPE,
+            NoteColumns.WIDGET_ID,
+            NoteColumns.WIDGET_TYPE,
     };
 
-    private static final int ID_COLUMN                    = 0;
-    private static final int ALERTED_DATE_COLUMN          = 1;
-    private static final int BG_COLOR_ID_COLUMN           = 2;
-    private static final int CREATED_DATE_COLUMN          = 3;
-    private static final int HAS_ATTACHMENT_COLUMN        = 4;
-    private static final int MODIFIED_DATE_COLUMN         = 5;
-    private static final int NOTES_COUNT_COLUMN           = 6;
-    private static final int PARENT_ID_COLUMN             = 7;
-    private static final int SNIPPET_COLUMN               = 8;
-    private static final int TYPE_COLUMN                  = 9;
-    private static final int WIDGET_ID_COLUMN             = 10;
-    private static final int WIDGET_TYPE_COLUMN           = 11;
+    // 各列数据的索引
+    private static final int ID_COLUMN = 0;
+    private static final int ALERTED_DATE_COLUMN = 1;
+    private static final int BG_COLOR_ID_COLUMN = 2;
+    private static final int CREATED_DATE_COLUMN = 3;
+    private static final int HAS_ATTACHMENT_COLUMN = 4;
+    private static final int MODIFIED_DATE_COLUMN = 5;
+    private static final int NOTES_COUNT_COLUMN = 6;
+    private static final int PARENT_ID_COLUMN = 7;
+    private static final int SNIPPET_COLUMN = 8;
+    private static final int TYPE_COLUMN = 9;
+    private static final int WIDGET_ID_COLUMN = 10;
+    private static final int WIDGET_TYPE_COLUMN = 11;
 
+    // 笔记的各项数据
     private long mId;
     private long mAlertDate;
     private int mBgColorId;
@@ -70,13 +76,21 @@ public class NoteItemData {
     private String mName;
     private String mPhoneNumber;
 
+    // 用于标识笔记在列表中的位置状态
     private boolean mIsLastItem;
     private boolean mIsFirstItem;
     private boolean mIsOnlyOneItem;
     private boolean mIsOneNoteFollowingFolder;
     private boolean mIsMultiNotesFollowingFolder;
 
+    /**
+     * 根据Cursor数据构造一个NoteItemData对象。
+     *
+     * @param context 上下文对象，用于访问应用全局功能。
+     * @param cursor  包含笔记数据的Cursor对象。
+     */
     public NoteItemData(Context context, Cursor cursor) {
+        // 从Cursor中提取各项数据并赋值
         mId = cursor.getLong(ID_COLUMN);
         mAlertDate = cursor.getLong(ALERTED_DATE_COLUMN);
         mBgColorId = cursor.getInt(BG_COLOR_ID_COLUMN);
@@ -92,6 +106,7 @@ public class NoteItemData {
         mWidgetId = cursor.getInt(WIDGET_ID_COLUMN);
         mWidgetType = cursor.getInt(WIDGET_TYPE_COLUMN);
 
+        // 如果是通话记录笔记，尝试获取通话号码和联系人名称
         mPhoneNumber = "";
         if (mParentId == Notes.ID_CALL_RECORD_FOLDER) {
             mPhoneNumber = DataUtils.getCallNumberByNoteId(context.getContentResolver(), mId);
@@ -103,19 +118,27 @@ public class NoteItemData {
             }
         }
 
+        // 如果没有获取到联系人名称，则默认为空字符串
         if (mName == null) {
             mName = "";
         }
         checkPostion(cursor);
     }
 
+    /**
+     * 根据当前Cursor位置，更新NoteItemData的状态信息（如是否为列表中的最后一个项目等）。
+     *
+     * @param cursor 包含笔记数据的Cursor对象。
+     */
     private void checkPostion(Cursor cursor) {
-        mIsLastItem = cursor.isLast() ? true : false;
-        mIsFirstItem = cursor.isFirst() ? true : false;
+        // 更新位置状态信息
+        mIsLastItem = cursor.isLast();
+        mIsFirstItem = cursor.isFirst();
         mIsOnlyOneItem = (cursor.getCount() == 1);
         mIsMultiNotesFollowingFolder = false;
         mIsOneNoteFollowingFolder = false;
 
+        // 检查当前笔记是否跟随文件夹，并更新相应状态
         if (mType == Notes.TYPE_NOTE && !mIsFirstItem) {
             int position = cursor.getPosition();
             if (cursor.moveToPrevious()) {
@@ -127,12 +150,15 @@ public class NoteItemData {
                         mIsOneNoteFollowingFolder = true;
                     }
                 }
+                // 确保Cursor能够回到原来的位置
                 if (!cursor.moveToNext()) {
                     throw new IllegalStateException("cursor move to previous but can't move back");
                 }
             }
         }
     }
+
+    // 以下为获取NoteItemData各项属性的方法
 
     public boolean isOneFollowingFolder() {
         return mIsOneNoteFollowingFolder;
@@ -190,7 +216,7 @@ public class NoteItemData {
         return mNotesCount;
     }
 
-    public long getFolderId () {
+    public long getFolderId() {
         return mParentId;
     }
 
@@ -218,7 +244,14 @@ public class NoteItemData {
         return (mParentId == Notes.ID_CALL_RECORD_FOLDER && !TextUtils.isEmpty(mPhoneNumber));
     }
 
+    /**
+     * 从Cursor中获取笔记的类型。
+     *
+     * @param cursor 包含笔记数据的Cursor对象。
+     * @return 笔记的类型。
+     */
     public static int getNoteType(Cursor cursor) {
         return cursor.getInt(TYPE_COLUMN);
     }
 }
+

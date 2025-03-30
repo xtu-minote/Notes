@@ -25,7 +25,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical">
-
+        <!-- 标题栏 -->
         <LinearLayout
             android:id="@+id/note_title"
             android:layout_width="fill_parent"
@@ -63,6 +63,7 @@
                 android:background="@drawable/bg_btn_set_color" />
         </LinearLayout>
 
+        <!-- 编辑区域 -->
         <LinearLayout
             android:id="@+id/sv_note_edit"
             android:layout_width="fill_parent"
@@ -116,6 +117,7 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- 背景颜色设置按钮 -->
     <ImageView
         android:id="@+id/btn_set_bg_color"
         android:layout_height="43dip"
@@ -123,6 +125,7 @@
         android:background="@drawable/bg_color_btn_mask"
         android:layout_gravity="top|right" />
 
+    <!-- 背景颜色选择器 -->
     <LinearLayout
         android:id="@+id/note_bg_color_selector"
         android:layout_width="wrap_content"
