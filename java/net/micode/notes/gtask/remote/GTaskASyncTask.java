@@ -63,27 +63,6 @@ public class GTaskASyncTask extends AsyncTask<Void, String, Integer> {
         });
     }
 
-    // Modified:
-    private void showNotification(int tickerId, String content) {
-        PendingIntent pendingIntent;
-        if (tickerId != R.string.ticker_success) {
-            pendingIntent = PendingIntent.getActivity(mContext, 0, new Intent(mContext,
-                    NotesPreferenceActivity.class), PendingIntent.FLAG_IMMUTABLE);
-        } else {
-            pendingIntent = PendingIntent.getActivity(mContext, 0, new Intent(mContext,
-                    NotesListActivity.class), PendingIntent.FLAG_IMMUTABLE);
-        }
-        Notification.Builder builder = new Notification.Builder(mContext)
-                .setAutoCancel(true)
-                .setContentTitle(mContext.getString(R.string.app_name))
-                .setContentText(content)
-                .setContentIntent(pendingIntent)
-                .setWhen(System.currentTimeMillis())
-                .setOngoing(true);
-        Notification notification=builder.getNotification();
-        mNotifiManager.notify(GTASK_SYNC_NOTIFICATION_ID, notification);
-    }
-
 //    private void showNotification(int tickerId, String content) {
 //        Notification notification = new Notification(R.drawable.notification, mContext
 //                .getString(tickerId), System.currentTimeMillis());
@@ -102,6 +81,25 @@ public class GTaskASyncTask extends AsyncTask<Void, String, Integer> {
 //                pendingIntent);
 //        mNotifiManager.notify(GTASK_SYNC_NOTIFICATION_ID, notification);
 //    }
+private void showNotification(int tickerId, String content) {
+    PendingIntent pendingIntent;
+    if (tickerId != R.string.ticker_success) {
+        pendingIntent = PendingIntent.getActivity(mContext, 0, new Intent(mContext,
+                NotesPreferenceActivity.class), PendingIntent.FLAG_IMMUTABLE);
+    } else {
+        pendingIntent = PendingIntent.getActivity(mContext, 0, new Intent(mContext,
+                NotesListActivity.class), PendingIntent.FLAG_IMMUTABLE);
+    }
+    Notification.Builder builder = new Notification.Builder(mContext)
+            .setAutoCancel(true)
+            .setContentTitle(mContext.getString(R.string.app_name))
+            .setContentText(content)
+            .setContentIntent(pendingIntent)
+            .setWhen(System.currentTimeMillis())
+            .setOngoing(true);
+    Notification notification=builder.getNotification();
+    mNotifiManager.notify(GTASK_SYNC_NOTIFICATION_ID, notification);
+}
 
     @Override
     protected Integer doInBackground(Void... unused) {
